@@ -29,7 +29,8 @@ let video;
 // elle initialise le jeu
 function setup() {
   // on charge le modèle
-  classifier = ml5.imageClassifier("url-du-model-teachable-machine/model.json");
+  //classifier = ml5.imageClassifier("https://teachablemachine.withgoogle.com/models/412YdC4t2/model.json"); (MODEL IMAGE)
+  classifier = ml5.soundClassifier("https://teachablemachine.withgoogle.com/models/k-cd3N5GG/model.json")
 
   // ce code permet de récupérer la vidéo de la webcam
   video = createCapture(VIDEO);
@@ -39,7 +40,8 @@ function setup() {
   // il va essayer de deviner quel mouvement on fait
   // quand il aura trouvé, il lancera la fonction 'findMovement'
   // avec le mouvement identifié
-  classifier.classify(video, findMovement);
+  //classifier.classify(video, findMovement); (MODEL IMAGE)
+  classifier.classify(findMovement);
 
   // notre écran de jeu fait la largeur 'gameWidth' et la hauteur 'gameHeight'
   createCanvas(gameWidth, gameHeight);
@@ -88,6 +90,15 @@ function goDown() {
   snakeY += pixelSize;
 }
 
+function goRight(){
+  snakeX += pixelSize;
+}
+
+function goLeft(){
+  snakeX -= pixelSize;
+}
+
+
 // cette fonction est lancée quand le modèle identifie un mouvement
 function findMovement(error, results) {
   // en cas d'erreur, on l'affiche
@@ -99,6 +110,16 @@ function findMovement(error, results) {
   // on récupère le label du résultat
   // il s'agit des classes crées dans Teachable Machine
   let label = results[0].label;
+  if (label == 'haut'){
+    goUp();
+  }else if (label == 'bas'){
+    goDown();
+  } else if (label == 'droite'){
+    goRight();
+  } else if (label == 'gauche'){
+    goLeft();
+  }
+  console.log(label);
 
   // c'est ici qu'on lancera les fonctions liées au mouvement
   // par exemple, dans mon cas, j'avais une classe "haut" et "bas"
@@ -110,7 +131,8 @@ function findMovement(error, results) {
   // dans tous les cas, on relance le modèle
   // pour identifier le prochain mouvement
   setTimeout(function() {
-    classifier.classify(video, findMovement);
+    //classifier.classify(video, findMovement);(MODEL IMAGE)
+    classifier.classify(findMovement);
   }, 1000);
 }
 
@@ -138,6 +160,12 @@ function keyPressed() {
       break;
     case 40: // 40 à flèche du bas
       goDown();
+      break;
+      case 39: // 39 à flèche de droite
+      goRight();
+      break;
+      case 37: // 37 à flèche de gauche
+      goLeft();
       break;
   }
 }
